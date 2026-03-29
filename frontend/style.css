@@ -13,7 +13,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Silkscreen', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -260,7 +260,7 @@ h1 .line2 {
     color: #050810;
     border: none;
     border-radius: 12px;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Silkscreen', sans-serif;
     font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -399,7 +399,7 @@ footer span { color: var(--accent); }
     color: var(--muted);
     border: 1px solid var(--border);
     border-radius: 12px;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Silkscreen', sans-serif;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
