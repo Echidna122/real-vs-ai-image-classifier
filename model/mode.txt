@@ -1,0 +1,105 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+import tensorflow as tf
+from tensorflow.keras import layers,models
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+
+train_dir = "/kaggle/input/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images/train"
+test_dir = "/kaggle/input/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images/test"
+
+img_size = (32,32)
+BATCH_SIZE = 64
+EPOCHS = 20
+
+train_datagen = ImageDataGenerator(
+    rescale = 1./255,
+    validation_split = 0.1,
+    horizontal_flip = True,
+    rotation_range = 10,
+    zoom_range = 0.1,
+)
+
+test_datagen = ImageDataGenerator(rescale = 1./255)
+
+train_gen = train_datagen.flow_from_directory(
+    train_dir,
+    target_size = img_size,
+    batch_size = BATCH_SIZE,
+    class_mode = "binary",
+    subset = "training",
+    seed = 42
+    
+)
+val_gen = train_datagen.flow_from_directory(
+    train_dir,
+    target_size=img_size,
+    batch_size=BATCH_SIZE,
+    class_mode="binary",
+    subset="validation",
+    seed=42,
+)
+
+test_gen = test_datagen.flow_from_directory(
+    test_dir,
+    target_size=img_size,
+    batch_size=BATCH_SIZE,
+    class_mode="binary",
+    shuffle=False,
+)
+
+print("Class indices:", train_gen.class_indices)
+
+
+
+def build_model():
+    model = models.Sequential([
+
+        layers.Conv2D(32,(3,3), activation="relu", padding="same",input_shape=(32,32,3)),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D(2,2),
+
+        layers.Conv2D(64, (3,3), activation="relu", padding="same"),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D(2, 2),
+
+        layers.Conv2D(128, (3,3), activation="relu", padding="same"),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D(2, 2),
+
+        layers.Flatten(),
+        layers.Dense(256, activation="relu"),
+        layers.Dropout(0.4),
+        layers.Dense(1, activation="sigmoid"),
+    ])
+    return model
+
+model = build_model()
+model.summary()
+
+model.compile(
+    optimizer = tf.keras.optimizers.Adam(1e-3),
+    loss = 'binary_crossentropy',
+    metrics = ['accuracy'],
+)
+
+callbacks = [
+    EarlyStopping(patience = 4, restore_best_weights = True, verbose = 1),
+    ReduceLROnPlateau(factor = 0.5, patience = 2, verbose = 1)
+]
+
+history = model.fit(
+    train_gen,
+    validation_data = val_gen,
+    epochs = EPOCHS,
+    callbacks = callbacks,
+)
+
+loss, acc = model.evaluate(test_gen)
+print(f"\n Test Accuracy: {acc*100:.2f}%")
+print(f"Test Loss: {loss:.4f}")
+
+model.save("ai_real_model.keras")
+print("saved")
