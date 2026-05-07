@@ -2,7 +2,7 @@
 
 A web app that classifies images as **AI-generated** or **Real** using a deep learning model.
 
-🔗 **Live Demo:** [https://real-vs-ai-image-classifier.vercel.app](https://real-vs-ai-image-classifier.vercel.app)
+
 
 ---
 
